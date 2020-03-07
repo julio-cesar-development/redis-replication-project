@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  master:
+    container_name: master
+    build:
+      context: ./redis-master/
+      dockerfile: Dockerfile
+    ports:
+      - 20000:6379
+    restart: always
+    environment:
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASS: masterpassword
+      NODE_NAME: master
+    networks:
+      - redis
+    volumes:
+      - ./redis-master/redis-master.conf:/etc/redis/redis.conf
+
+  slave:
+    container_name: slave
+    build:
+      context: ./redis-slave/
+      dockerfile: Dockerfile
+    ports:
+      - 30000:6379
+    restart: always
+    depends_on:
+      - master
+    environment:
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASS: slavepassword
+      NODE_NAME: slave
+    networks:
+      - redis
+    volumes:
+      - ./redis-slave/redis-slave.conf:/etc/redis/redis.conf
+
+networks:
+  redis:
+    driver: bridge
