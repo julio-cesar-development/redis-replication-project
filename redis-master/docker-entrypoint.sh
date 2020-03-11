@@ -2,11 +2,8 @@
 set -e
 
 redis-server /etc/redis/redis.conf &
-
-while [ ! -f /var/log/redis/redis-server.log ]; do
-  echo "Waiting..."
-  sleep 5
-done
+REDIS_PID="$!"
+wait $REDIS_PID
 
 echo "Starting ${NODE_NAME}..."
 tail -f /var/log/redis/redis-server.log
